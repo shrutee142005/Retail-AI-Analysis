@@ -1,0 +1,457 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Retail AI Analysis Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Chart.js for dashboard charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Dashboard JavaScript -->
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <div class="app-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">R</div>
+                <div>
+                    <h2>Retail AI</h2>
+                    <p>Analytics Platform</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-link active">
+                    <span>▦</span> Dashboard
+                </a>
+
+                <a href="#forecast-section" class="nav-link">
+                    <span>↗</span> Revenue Forecast
+                </a>
+
+                <a href="#customers-section" class="nav-link">
+                    <span>♙</span> Customers
+                </a>
+
+                <a href="#segments-section" class="nav-link">
+                    <span>◉</span> Customer Segments
+                </a>
+
+                <a href="#insights-section" class="nav-link">
+                    <span>✧</span> AI Insights
+                </a>
+
+                <a href="#recommendations-section" class="nav-link">
+                    <span>💡</span> Business Recommendations
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <span id="sidebarStatusDot" class="status-dot"></span>
+                <span id="sidebarStatus">Connecting...</span>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content" id="dashboard">
+
+            <!-- TOP HEADER -->
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">RETAIL INTELLIGENCE</p>
+                    <h1>Retail AI Dashboard</h1>
+                    <p class="subtitle">
+                        Understand customers, forecast revenue and discover
+                        business growth opportunities.
+                    </p>
+                </div>
+
+                <div class="topbar-actions">
+                    <span id="connection" class="connection-status">
+                        Connecting to Flask API...
+                    </span>
+
+                    <button id="refreshBtn" class="primary-btn" type="button">
+                        ↻ Refresh Data
+                    </button>
+                </div>
+            </header>
+
+            <!-- OVERVIEW CARDS -->
+            <section class="stats-grid">
+                <article class="stat-card">
+                    <div class="stat-heading">
+                        <span>Total Customers</span>
+                        <span class="stat-icon purple">♙</span>
+                    </div>
+
+                    <h2 id="customers">—</h2>
+                    <p class="stat-description">
+                        Customers in the database
+                    </p>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-heading">
+                        <span>Forecast Periods</span>
+                        <span class="stat-icon blue">▥</span>
+                    </div>
+
+                    <h2 id="months">—</h2>
+                    <p class="stat-description">
+                        Available forecast records
+                    </p>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-heading">
+                        <span>Highest Forecast</span>
+                        <span class="stat-icon green">↗</span>
+                    </div>
+
+                    <h2 id="highest">—</h2>
+                    <p class="stat-description" id="highestMonth">
+                        Forecast month
+                    </p>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-heading">
+                        <span>Lowest Forecast</span>
+                        <span class="stat-icon orange">↘</span>
+                    </div>
+
+                    <h2 id="lowest">—</h2>
+                    <p class="stat-description" id="lowestMonth">
+                        Forecast month
+                    </p>
+                </article>
+            </section>
+
+            <!-- REVENUE FORECAST -->
+            <section class="dashboard-section" id="forecast-section">
+                <div class="section-header">
+                    <div>
+                        <p class="eyebrow">PREDICTIVE ANALYTICS</p>
+                        <h2>Revenue Forecast</h2>
+                        <p class="section-description">
+                            Explore predicted revenue across forecast periods.
+                        </p>
+                    </div>
+
+                    <div class="filter-control">
+                        <label for="monthFilter">Select period</label>
+
+                        <select id="monthFilter">
+                            <option value="all">All Months</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3>Predicted Revenue Trend</h3>
+                            <p id="selectedSummary">
+                                Loading forecast...
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+
+                    <p id="revenueChartMessage" class="helper-message"></p>
+                </div>
+
+                <div class="panel table-panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3>Forecast Details</h3>
+                            <p>Predicted revenue by period</p>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Month</th>
+                                    <th>Predicted Revenue</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="forecastTable">
+                                <tr>
+                                    <td colspan="3" class="empty-state">
+                                        Loading forecast data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CUSTOMER RECORDS -->
+            <section class="dashboard-section" id="customers-section">
+                <div class="section-header">
+                    <div>
+                        <p class="eyebrow">CUSTOMER DATA</p>
+                        <h2>Customer Records</h2>
+                        <p class="section-description">
+                            Search and explore customer records returned by the API.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header customer-panel-header">
+                        <div>
+                            <h3>Customer Directory</h3>
+                            <p id="customerSummary">
+                                Loading customer records...
+                            </p>
+                        </div>
+
+                        <div class="search-control">
+                            <label for="customerSearch">Search customers</label>
+
+                            <input
+                                type="search"
+                                id="customerSearch"
+                                placeholder="Search customer data..."
+                                autocomplete="off"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead id="customerTableHead"></thead>
+
+                            <tbody id="customerTable">
+                                <tr>
+                                    <td class="empty-state">
+                                        Loading customer records...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CUSTOMER SEGMENTATION -->
+            <section class="dashboard-section" id="segments-section">
+                <div class="section-header">
+                    <div>
+                        <p class="eyebrow">MACHINE LEARNING</p>
+                        <h2>Customer Segmentation</h2>
+                        <p class="section-description">
+                            Understand customer groups using their purchasing
+                            behaviour and spending patterns.
+                        </p>
+                    </div>
+
+                    <div class="filter-control">
+                        <label for="segmentFilter">Filter cluster</label>
+
+                        <select id="segmentFilter">
+                            <option value="all">All Clusters</option>
+                            <option value="0">Cluster 0</option>
+                            <option value="1">Cluster 1</option>
+                            <option value="2">Cluster 2</option>
+                            <option value="3">Cluster 3</option>
+                        </select>
+
+                        <button
+                            id="resetSegmentFilter"
+                            class="secondary-btn"
+                            type="button"
+                        >
+                            Reset Filter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SEGMENT SUMMARY -->
+                <div class="stats-grid segment-stats">
+                    <article class="stat-card">
+                        <div class="stat-heading">
+                            <span>Customers in View</span>
+                            <span class="stat-icon purple">♙</span>
+                        </div>
+
+                        <h2 id="segmentTotalCustomers">—</h2>
+                        <p class="stat-description">
+                            Customers in selected clusters
+                        </p>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-heading">
+                            <span>Clusters in View</span>
+                            <span class="stat-icon blue">◉</span>
+                        </div>
+
+                        <h2 id="segmentTotalGroups">—</h2>
+                        <p class="stat-description">
+                            Customer groups displayed
+                        </p>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-heading">
+                            <span>Largest Cluster</span>
+                            <span class="stat-icon green">★</span>
+                        </div>
+
+                        <h2 id="largestSegment">—</h2>
+                        <p class="stat-description" id="largestSegmentCount">
+                            Customer count
+                        </p>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-heading">
+                            <span>Largest Cluster Share</span>
+                            <span class="stat-icon orange">%</span>
+                        </div>
+
+                        <h2 id="largestSegmentShare">—</h2>
+                        <p class="stat-description">
+                            Share of total database customers
+                        </p>
+                    </article>
+                </div>
+
+                <!-- SEGMENT CHART -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3>Cluster Size Comparison</h3>
+                            <p>Number of customers in each cluster</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="segmentChart"></canvas>
+                    </div>
+
+                    <p id="segmentChartMessage" class="helper-message"></p>
+                </div>
+
+                <!-- SEGMENT TABLE -->
+                <div class="panel table-panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3>Cluster Analysis</h3>
+                            <p>
+                                Customer count, spending, frequency and recency
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cluster</th>
+                                    <th>Customers</th>
+                                    <th>Share</th>
+                                    <th>Avg. Spending</th>
+                                    <th>Avg. Frequency</th>
+                                    <th>Avg. Recency</th>
+                                    <th>Avg. Order Value</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="segmentTable">
+                                <tr>
+                                    <td colspan="7" class="empty-state">
+                                        Loading segmentation data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI INSIGHTS -->
+            <section class="dashboard-section" id="insights-section">
+                <div class="section-header">
+                    <div>
+                        <p class="eyebrow">INTELLIGENT ANALYSIS</p>
+                        <h2>AI Customer Insights</h2>
+                        <p class="section-description">
+                            Actionable observations derived from customer
+                            segmentation metrics.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="insightCards" class="insights-grid">
+                    <article class="insight-card">
+                        <div class="insight-icon">✧</div>
+                        <h3>Preparing customer insights</h3>
+                        <p>
+                            Insights will appear when segmentation data loads.
+                        </p>
+                    </article>
+                </div>
+            </section>
+
+            <!-- CLUSTER-WISE BUSINESS RECOMMENDATIONS -->
+            <section
+                class="dashboard-section"
+                id="recommendations-section"
+            >
+                <div class="section-header">
+                    <div>
+                        <p class="eyebrow">BUSINESS STRATEGY</p>
+                        <h2>Cluster-wise Business Recommendations</h2>
+                        <p class="section-description">
+                            Suggested actions for each customer group based on
+                            average spending, shopping frequency and recency.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="clusterRecommendations" class="insights-grid">
+                    <article class="insight-card">
+                        <div class="insight-icon">💡</div>
+                        <h3>Loading recommendations</h3>
+                        <p>
+                            Recommendations will appear after the customer
+                            segment data loads.
+                        </p>
+                    </article>
+                </div>
+            </section>
+
+            <!-- FOOTER -->
+            <footer class="dashboard-footer">
+                <p>Retail AI Analysis Dashboard</p>
+                <p>
+                    Revenue forecasting · Customer segmentation ·
+                    Business intelligence
+                </p>
+            </footer>
+
+        </main>
+    </div>
+</body>
+</html>
